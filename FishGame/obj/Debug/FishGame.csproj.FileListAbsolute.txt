@@ -1,12 +1,6 @@
 C:\Users\yonca.karagoz\Desktop\FishGame\FishGame\bin\FishGame.dll.config
 C:\Users\yonca.karagoz\Desktop\FishGame\FishGame\bin\FishGame.dll
 C:\Users\yonca.karagoz\Desktop\FishGame\FishGame\bin\FishGame.pdb
-C:\Users\yonca.karagoz\Desktop\FishGame\FishGame\obj\Debug\FishGame.csprojResolveAssemblyReference.cache
 C:\Users\yonca.karagoz\Desktop\FishGame\FishGame\obj\Debug\FishGame.dll
 C:\Users\yonca.karagoz\Desktop\FishGame\FishGame\obj\Debug\FishGame.pdb
-C:\Users\yonca.karagoz\Desktop\Sources\FishGame\FishGame\bin\FishGame.dll.config
-C:\Users\yonca.karagoz\Desktop\Sources\FishGame\FishGame\bin\FishGame.dll
-C:\Users\yonca.karagoz\Desktop\Sources\FishGame\FishGame\bin\FishGame.pdb
-C:\Users\yonca.karagoz\Desktop\Sources\FishGame\FishGame\obj\Debug\FishGame.csprojResolveAssemblyReference.cache
-C:\Users\yonca.karagoz\Desktop\Sources\FishGame\FishGame\obj\Debug\FishGame.dll
-C:\Users\yonca.karagoz\Desktop\Sources\FishGame\FishGame\obj\Debug\FishGame.pdb
+C:\Users\yonca.karagoz\Desktop\FishGame\FishGame\obj\Debug\FishGame.csprojResolveAssemblyReference.cache

@@ -1,92 +1,149 @@
-﻿body {
-
-    height: 100%;
-    width: 100%;
-    margin: 0;
+﻿body
+{
+        height: 100%;
+        width: 100%;
+        margin: 0;
 }
 
-#background {
 
-        position: relative;
+#background
+{
+        /*position: relative;*/
         overflow: hidden;
         border: 1px solid #d3d3d3;
         background: url("bg.png") no-repeat;
         background-size: cover;
         padding-left: 0;
         padding-right: 0;
-        margin-left: auto;
-        margin-right: auto;
+}
+
+.frame
+{
         display: block;
-        width: 1500px;
-        height: 1000px;
+        width: 960px;
+        height: 500px;
+        position: absolute;
+        top: 100px;
 }
 
-#plane {
-
-    position: absolute;
-    background: url('plane.png');
-    height: 100px;
-    width: 100px;
-    background-size: contain;
-    background-repeat: no-repeat;
-    top: 45%;
-    left: 5%;
+#frameContainer
+{
+        text-align: center;
+        position: relative;
 }
 
-.bullet{
+#frames
+{
+        position: relative;
+        display: inline-block;
+        width: 960px;
+}
 
-        position:absolute;
+#plane
+{
+        position: absolute;
+        background: url('plane.png');
+        height: 90px;
+        width: 90px;
+        background-size: contain;
+        background-repeat: no-repeat;
+        top: 45%;
+        left: 5%;
+}
+
+.bullet
+{
+        position: absolute;
         width: 20px;
-        height: 20px;
+        height: 10px;
         left: 11.4%;
         background-color: aqua;
-
 }
 
-.transparent{
-
+.transparent
+{
         background: transparent !important;
 }
 
-.obstacle {
-
-    position: absolute;
-    width: 20px;
-    height: 20px;
-    /*right: -50px;*/
-    background : url("red.jpg") repeat;
-
-   
+.obstacleContainer
+{
+        position: absolute;
+        display: inline-block;
+        width: 20px;
+        height: 400px;
 }
 
-#obstacleUp{
+.hide
+{
+        display: none !important;
+}
 
+.obstacle
+{
+        background: url(red.jpg) repeat;
+        width: 20px;
+        height: 20px;
+        display: inline-block;
+}
+
+.space
+{
+        background: transparent !important;
+}
+
+.right
+{
+        right: 0;
+}
+
+.left
+{
+        left: 0;
+}
+
+.top
+{
         top: 0;
 }
 
-#obstacleDown{
-
+.bottom
+{
         bottom: 0;
 }
 
-#score{
+.wall
+{
+        position: absolute;
+        background: #b2afaf;
+        width: 10px;
+        height: 10px;
+}
 
+.horizontal
+{
+        width: 100%;
+}
+
+.vertical
+{
+        height: 100%;
+}
+
+#score
+{
         text-align: center;
         font-size: 35px;
         padding-top: 10px;
-
 }
 
-#retry{
-
+#retry
+{
         color: chartreuse;
         font-size: 45px;
 }
 
-#gameOver{
-
-        width: 1500px;
-        height: 1000px;
+#gameOver
+{
         /*background-color: black;*/
         color: red;
         font-family: Impact;
@@ -94,16 +151,6 @@
         text-align: center;
         position: absolute;
         z-index: 200;
-        
+        display: none;
+        margin-top: 115px;
 }
-
-p{
-        z-index: 500;
-        margin-top: 390px;
-        border-bottom : none;
-}
-
-
-
-
-

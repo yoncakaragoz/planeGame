@@ -9,25 +9,26 @@
 </head>
 
 <body>
-
-        <div id="background">
-
-                <div id="gameOver">
-                        <p>
-                                YOU'VE
-                                <br> LOST
-                        </p>
-                        <a id="retry" href="#" style="text-decoration:none;">
-                                <p>RETRY</p>
-                        </a>
-                       
+        <div id="frameContainer">
+                <div id="frames">
+                        <div id="background" class="frame">
+                                <div id="plane"></div>
+                                <div class="wall top horizontal"></div>
+                                <div class="wall left vertical"></div>
+                                <div class="wall right vertical"></div>
+                                <div class="wall bottom horizontal"></div>
+                        </div>
+                        <div id="gameOver" class="frame">
+                                <p>
+                                        YOU HAVE
+                                        <br> FAILED ME
+                                </p>
+                                <a id="retry" href="#" style="text-decoration:none;">
+                                        <p>RETRY</p>
+                                </a>
+                        </div>
                 </div>
-
-                <div id="plane"></div>
-             
         </div>
-
-
         <div  style="text-align:center; font-size:40px; font-weight:800; margin:auto; width:50%;">
 
                 <span style="border-bottom:6px solid black; margin-bottom:5px;">
@@ -35,6 +36,10 @@
                 </span>
                 <div id="score">0</div>
         </div>
+
+        <div class="obstacleContainer hide"></div>
+        <div class="obstacle hide"></div>
+        <div class="bullet hide"></div>
 
 
         <script src="jquery.min.js"></script>

@@ -1,18 +1,14 @@
-﻿$(function () {
-     
-        var bg = $('#background');
-        var plane = $('#plane');
-        var obstacles = $('.obstacle');
-        var obstacleUp = $('#obstacleUp');
-        var obstacleDown = $('#obstacleDown');
-        var score = $('#score');
-        var gameOver = $('#gameOver');
-        var retry = $('#retry');
-        var bullet = $('.bullet');
+﻿var CONSTANTS = Object.create(null);
+CONSTANTS.BULLET_HEIGHT = 10;
+Object.freeze(CONSTANTS);
 
-        var bgWidth = parseInt(bg.width());
-        var bgHeight = parseInt(bg.height());
-        var planeLeft = parseInt(plane.css('left'));
+$(function () {
+
+        var plane = $('#plane');
+        var retry = $('#retry');
+        
+        var bgWidth = parseInt($('#background').width());
+        var bgHeight = parseInt($('#background').height());
         var planeHeight = parseInt(plane.height());
 
         var up = false;
@@ -21,263 +17,177 @@
         var down = false;
 
         var speed = 10;
-        var insSpeed = 0;
-
-        var point = 0;
+        
+        var score = 0;
 
         var fire = false;
         var over = false;
 
-        var cUp, cDown;
 
-      
-        var playGame = setInterval(function () {
+        var mainIntervalId = setInterval(function () {
 
-                gameOver.hide();
-              
+                $(".obstacleContainer").not(".hide").css("right", $(".obstacleContainer").position().right - speed);
 
-                var posPlane = $('#plane').position();
-                var planeLeft = ~~(posPlane && posPlane.left);
-                var planeTop = ~~(posPlane && posPlane.top);
+                $('.bullet').not(".hide").each(function () {
 
+                        $(this).css("left", $(this).position().left + (speed * 2));
+                });
 
-                var posObstacleUp = $('#obstacleUp').position();
-                var obstacleUpLeft = ~~(posObstacleUp && posObstacleUp.left);
-                var obstacleUpHeight = ~~($('#obstacleUp').height());
-                var obstacleUpTop = ~~($('#obstacleUp').top);
+                // tile collision with plane and bullets
+                var rigidTiles = $('.obstacle').not('.space, .hide');
 
+                rigidTiles.each(function () {
 
-                var posObstacleDown = $('#obstacleDown').position();
-                var obstacleDownLeft = ~~(posObstacleDown && posObstacleDown.left);
-                var obstacleDownHeight = ~~($('#obstacleDown').height());
+                        var tile = $(this);
+                        $('.bullet').not(".hide").each(function () {
 
-                
-                var posObstacle = $('.obstacle').position();
-                var obstacleTopX = ~~(posObstacle && posObstacle.left); 
-                obstacles.css("left", obstacleTopX - speed);            
-               
+                                var bullet = $(this);
+                                if (isColliding(bullet, tile)) {
 
-                //var upCrash = ((0 < planeTop && planeTop < 20 * (cUp)) && (planeLeft > (obstacleUpLeft - 110)));
-                //var downCrash = (((20 * (cUp) + 115 < planeTop) && planeTop < 1000) && planeLeft > (obstacleDownLeft - 110));
+                                        tile.addClass("space");
+                                        bullet.remove();
+                                }
+                        });
 
+                        if (isColliding(plane, tile)) {
 
-                $('.bullet').each(function () {
+                                stopGame();
+                        }
+                });
 
-                        var posBullet = $(this).position();
-                        var bulletLeft = ~~(posBullet && posBullet.left);
-                        $(this).css("left", bulletLeft + speed + 10);
+                // bullet collision with right wall
+                $('.bullet').not(".hide").each(function () {
 
+                        var bullet = $(this);
+                        var rightWall = $(".wall.right")
+                        if (isColliding(bullet, rightWall)) {
+
+                                bullet.remove();
+                        }
+                });
+
+                 //plane collision with walls
+                $('.wall').each(function () {
+
+                        var wall = $(this);
+                        if (isColliding(plane, wall)) {
+
+                                stopGame();
+                        }
                 });
 
 
-                checkBullet();
-
-                obstacles = $('.obstacle');
-                var arrOfNotTransparent = obstacles.not('.transparent');
-
-                for (var i = 0; i < arrOfNotTransparent.length; i++) {
-
-                        if (conflict(plane, $(arrOfNotTransparent[i]))) {
-                                
-                                over = true;
-                                gameOver.fadeIn();
-                                stopGame();
-                                
-                        }
-
-                        
-                }
-
-
-                if (!obstacles.length || ((obstacleTopX < 0))) {
+                if (!$(".obstacleContainer").not(".hide").size() || (($(".obstacleContainer").not(".hide").first().position().right < -bgWidth))) {
 
                         clearDivs();
-                        makeDivs();
+                        createNewWall();
 
                         speed += 0.25;
-                        console.log(speed);
-
-                        if (!over) {                                
-                                
-                                score.text(point);
-                                point++;
-                        }
+                        $('#score').text(++score);
 
                 }
 
-                //if (up === false) {
+                $('.bullet').not(".hide").each(function () {
+                        $(this).css("left", $(this).position().left + (speed * 2));
+                });
 
-                //        insSpeed += 0.25;
-                //        plane.css('top', parseInt(plane.css('top')) + insSpeed);
-                //}
-
-                //else {
-
-                //        insSpeed = 0;
-                //}
-
-                                                                       
         }, 30);
 
 
-        function clear(obs) {
-
-                var changed = false;
-
-                var posBullet = $('.bullet').position();
-                var bulletLeft = ~~(posBullet && posBullet.left);
-                var bulletTop = ~~(posBullet && posBullet.top);
-               
-                for (var i = 0; i < obs.length; i++) {
-
-                        if (bulletTop < parseInt(obs[i].style.top) && bulletTop < parseInt(obs[i].style.top) + 20 && !changed) {
-                                      
-                                obs.eq(i).addClass("transparent");
-                                changed = true;
-                              
-                        }
-
-                }
-
-                
-        }
-
-                 
+        // supports multiple obstacle containers
         function clearDivs() {
 
-                $("#obstacleUp, #obstacleDown").remove();
-            
+                var removeIndexes = [];
+
+                $(".obstacleContainer").each(function (index) {
+
+                        if ($(".obstacleContainer").position().right < -bgWidth) {
+
+                                removeIndexes.push(index);
+                        }     
+                });
+
+                for (var i = 0; i < removeIndexes.length; i++) {
+
+                        $(".obstacleContainer").eq(removeIndexes[i]).remove();
+                }
         }
 
 
-        function clearUpDiv() {
+        function createNewWall() {
+
+                var spaceInTheWall = planeHeight * 2;
+                var spacePosition = ((Math.random() * (bgHeight - (spaceInTheWall * 4 / 3))) + spaceInTheWall / 3) / CONSTANTS.BULLET_HEIGHT;
+                var totalNumTiles = (bgHeight - spaceInTheWall) / CONSTANTS.BULLET_HEIGHT;
+
+                var container = createTileContainer();
+                container.appendTo("#frameContainer");
+
+                var tileNo = 0;
+                for (; tileNo < spacePosition; tileNo++) {
+
+                        createTile().appendTo(container);
+                }
+
+                var spaceElement = createTile().addClass("space");
+                spaceElement.height(spaceInTheWall);
+                spaceElement.appendTo("#frameContainer");
                 
-                var upS = $("div[id*='obstacleUp']");
-                clear(upS);               
+                for (; tileNo < totalNumTiles; tileNo++) {
+
+                        createTile().appendTo(container);
+                }
+
+                return container;
         }
 
 
-        function clearDownDiv() {
+        function createTile() {
 
-                var downS = $("div[id*='obstacleDown']");
-                clear(downS);
-                   
+                return $(".obstacle.hide").clone().removeClass("hide");
         }
 
 
-        function makeDivs() {
+        function createTileContainer() {
 
-                cUp = Math.floor(Math.random() * 49);
-                cDown = 49 - cUp;
-                     
-                var $upDiv = $("<div class='obstacle' id='obstacleUp'></div>").css({
+                return $(".obstacleContainer.hide").clone().removeClass("hide");
+        }
 
-                        'left': bgWidth + 'px',
-                        'top':  0 + 'px',
-                        'height': 20 + 'px'
 
-                });
-                     
-                var $downDiv = $("<div class='obstacle' id='obstacleDown'></div>").css({
+        function createBullet() {
 
-                        'left': bgWidth + 'px',
-                        'down': 0 + 'px',
-                        'height': 20 + 'px'
-
-                });
-
-              
-                for (var i = 0; i < cUp; i++) {    
-                      
-                        $('#background').append($upDiv.clone().css({ 'top': (i * 20) + 'px' }));
-                }
-
-              
-
-                for (var i = 0;  i < cDown; i++) {
-                        
-                        $('#background').append($downDiv.clone().css({ 'top': (i * 20) + 140 + (cUp) * 20 + 'px' }));
-                }
-      
-             
-                obstacles = $('.obstacle');
+                return $(".bullet.hide").clone().removeClass("hide");
         }
 
 
         function makeBullet() {
-
-                var $newBullet = $("<div class='bullet'></div>").css(
+                //debugger;
+                createBullet().css(
                         {
-                                'left': (plane.offset().left - plane.width() - 10) + 'px', //this is for 100%
-                                'top': parseInt(plane.offset().top + 35) + 'px'
+                                'left': (plane.position().left + plane.width() + 10) + 'px', //this is for 100%
+                                'top': parseInt(plane.position().top + (plane.height() - $('.bullet').height()) / 2) + 'px'
                         }
-                );
-
-                $newBullet.appendTo('#background');
-
-                bullet = $('.bullet');
+                ).appendTo('#background');
         }
 
 
-        function checkBullet() {
-
+        function removeBullet() {
 
                 $('.bullet').each(function () {
-                        
 
-                        var posBullet = $(this).position();
-                        var bulletLeft = ~~(posBullet && posBullet.left);
-                        var bulletTop = ~~(posBullet && posBullet.top);
-
-
-                        var posObstacleUp = $('#obstacleUp').position();
-                        var obstacleUpLeft = ~~(posObstacleUp && posObstacleUp.left);
-                        var obstacleUpHeight = ~~($('#obstacleUp').height());
-                        var obstacleUpTop = ~~($('#obstacleUp').top);
-
-
-                        var posObstacleDown = $('#obstacleDown').position();
-                        var obstacleDownLeft = ~~(posObstacleDown && posObstacleDown.left);
-                        var obstacleDownHeight = ~~($('#obstacleDown').height());
-
-
-                        var scenario1 = bulletLeft > bgWidth;
-
-                        var scenario2 = ((0 < bulletTop && bulletTop < 20 * (cUp)) && (bulletLeft > (obstacleUpLeft - 37)));
-
-                        var scenario3 = (((20 * (cUp) + 115 < bulletTop) && bulletTop < 1000) && bulletLeft > (obstacleDownLeft - 37));
-
-
-                        if (scenario1) {
-                                        
-                                $(this).get(0).remove();
-            
-                        }
-
-                        if (scenario2) {
-          
-                                clearUpDiv();                               
-                                $(this).get(0).remove();
-
-                        }
-
-                        if (scenario3) {
-                                                                                    
-                                clearDownDiv();
-                                $(this).get(0).remove();
-                        }
-
-                })
-              
+                       this.remove();
+                       
+                });
         }
 
 
         function stopGame() {
 
-                clearInterval(playGame);
-                gameOver = true;
+                over = true;
+                removeBullet();
+                $('#gameOver').fadeIn();
+                clearInterval(mainIntervalId);
                 retry.slideDown();
-
         }
 
 
@@ -285,8 +195,6 @@
 
                 var newTop = parseInt(plane.css('top')) + 10;
                 plane.css('top', newTop);
-                
-
         }
 
 
@@ -294,8 +202,6 @@
 
                 var newTop = parseInt(plane.css('top')) - 10;
                 plane.css('top', newTop);
-               
-    
         }
 
 
@@ -303,8 +209,6 @@
 
                 var newLeft = parseInt(plane.css('left')) + 10;
                 plane.css('left', newLeft);
-                bullet.css('left', newLeft + 103);
-    
         }
 
 
@@ -312,8 +216,6 @@
 
                 var newLeft = parseInt(plane.css('left')) - 10;
                 plane.css('left', newLeft);
-                bullet.css('left', newLeft + 100);
-
         }
 
 
@@ -393,32 +295,31 @@
         });
 
 
-        function conflict($first, $second) {
+        function getPositions(elem) {
 
-                var firstLeft = $first.offset().left;
-                var firstTop = $first.offset().top;
+                var pos = elem.position();
+                var width = elem.width();
+                var height = elem.height();
 
-                var firstWidth = $first.outerWidth(true);
-                var firstHeight = $first.outerHeight(true);
+                return [[pos.left, pos.left + width], [pos.top, pos.top + height]];
+        }
 
-                var secondLeft = $second.offset().left;
-                var secondTop = $second.offset().top;
+        function comparePositions(p1, p2) {
 
-                var secondWidth = $second.outerWidth(true);
-                var secondHeight = $second.outerHeight(true);
+                var r1, r2;
+                r1 = p1[0] < p2[0] ? p1 : p2;
+                r2 = p1[0] < p2[0] ? p2 : p1;
 
-                var firstTotalHeight = firstTop + firstHeight;
-                var firstTotalWidth  = firstLeft + firstWidth; 
+                return r1[1] > r2[0] || r1[0] === r2[0];
+        }
 
-                var secondTotalWidth = secondLeft + secondWidth;
-                var secondTotalHeight = secondTop + secondHeight;
+        function isColliding(elem1,elem2) {
 
-                if (firstTotalHeight < secondTop || firstTop > secondTotalHeight || firstTotalWidth < secondLeft || firstLeft > secondTotalWidth )
+                var pos1 = getPositions(elem1);
+                var pos2 = getPositions(elem2);
 
-                        return false;
-
-                else
-                        return true;
+                return comparePositions(pos1[0], pos2[0]) && comparePositions(pos1[1], pos2[1]);
 
         }
+        
 });
