@@ -65,6 +65,7 @@
     <Content Include="red.jpg" />
     <Content Include="script.js" />
     <Content Include="style.css" />
+    <Content Include="Super-Fish.png" />
     <Content Include="Web.config" />
   </ItemGroup>
   <ItemGroup>

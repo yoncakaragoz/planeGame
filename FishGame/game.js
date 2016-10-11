@@ -1,13 +1,25 @@
 ﻿var CONSTANTS = Object.create(null);
 CONSTANTS.BULLET_HEIGHT = 10;
+CONSTANTS.WALL_DIMENTIONS = {
+        left: 0,
+        top: 0,
+        bottom: 500,
+        right: 960
+}
+CONSTANTS.WALL_THICKNESS = 10
 Object.freeze(CONSTANTS);
 
 $(function () {
+        $('.frame').css({
+                width: CONSTANTS.WALL_DIMENTIONS.right,
+                height: CONSTANTS.WALL_DIMENTIONS.bottom
+        });
+        $('.wall.vertical').width(CONSTANTS.WALL_THICKNESS);
+        $('.wall.horizontal').height(CONSTANTS.WALL_THICKNESS);
 
         var plane = $('#plane');
         var retry = $('#retry');
-        
-        var bgWidth = parseInt($('#background').width());
+
         var bgHeight = parseInt($('#background').height());
         var planeHeight = parseInt(plane.height());
 
@@ -17,21 +29,23 @@ $(function () {
         var down = false;
 
         var speed = 10;
-        
+
         var score = 0;
 
         var fire = false;
         var over = false;
 
-
+        createNewWall();
         var mainIntervalId = setInterval(function () {
 
-                $(".obstacleContainer").not(".hide").css("right", $(".obstacleContainer").position().right - speed);
+
 
                 $('.bullet').not(".hide").each(function () {
 
                         $(this).css("left", $(this).position().left + (speed * 2));
                 });
+
+                //$(".obstacleContainer").not(".hide").css("left", $(".obstacleContainer").position().left - speed);
 
                 // tile collision with plane and bullets
                 var rigidTiles = $('.obstacle').not('.space, .hide');
@@ -56,42 +70,40 @@ $(function () {
                 });
 
                 // bullet collision with right wall
-                $('.bullet').not(".hide").each(function () {
+                checkCollisionWithWall($('.bullet'));
 
-                        var bullet = $(this);
-                        var rightWall = $(".wall.right")
-                        if (isColliding(bullet, rightWall)) {
-
-                                bullet.remove();
-                        }
-                });
-
-                 //plane collision with walls
-                $('.wall').each(function () {
-
-                        var wall = $(this);
-                        if (isColliding(plane, wall)) {
-
-                                stopGame();
-                        }
-                });
+                //plane collision with walls
+                checkCollisionWithWall(plane);
 
 
-                if (!$(".obstacleContainer").not(".hide").size() || (($(".obstacleContainer").not(".hide").first().position().right < -bgWidth))) {
+                if (!!$(".obstacleContainer").not(".hide").size() && (($(".obstacleContainer").not(".hide").first().position().left < 0))) {
 
                         clearDivs();
                         createNewWall();
 
-                        speed += 0.25;
+                        //speed += 0.25;
                         $('#score').text(++score);
 
                 }
 
                 $('.bullet').not(".hide").each(function () {
+
                         $(this).css("left", $(this).position().left + (speed * 2));
                 });
 
         }, 30);
+
+        function checkCollisionWithWall(elements) {
+                elements.not(".hide").each(function () {
+
+                        var element = $(this);
+
+                        if (isCollidingWithWall(element)) {
+
+                                element.remove();
+                        }
+                });
+        }
 
 
         // supports multiple obstacle containers
@@ -99,12 +111,12 @@ $(function () {
 
                 var removeIndexes = [];
 
-                $(".obstacleContainer").each(function (index) {
+                $(".obstacleContainer").each(function (index, el) {
 
-                        if ($(".obstacleContainer").position().right < -bgWidth) {
+                        if ($(el).position().left < -CONSTANTS.WALL_DIMENTIONS.right) {
 
                                 removeIndexes.push(index);
-                        }     
+                        }
                 });
 
                 for (var i = 0; i < removeIndexes.length; i++) {
@@ -116,12 +128,13 @@ $(function () {
 
         function createNewWall() {
 
-                var spaceInTheWall = planeHeight * 2;
-                var spacePosition = ((Math.random() * (bgHeight - (spaceInTheWall * 4 / 3))) + spaceInTheWall / 3) / CONSTANTS.BULLET_HEIGHT;
-                var totalNumTiles = (bgHeight - spaceInTheWall) / CONSTANTS.BULLET_HEIGHT;
+                var spaceInTheWall = planeHeight / 2;
+                var rnd = Math.random();
+                var spacePosition = parseInt((rnd * (CONSTANTS.WALL_DIMENTIONS.bottom - spaceInTheWall)) / $(".obstacle.hide").height());
+                var totalNumTiles = ((CONSTANTS.WALL_DIMENTIONS.bottom - spaceInTheWall) / $(".obstacle.hide").height()) - 1;
 
                 var container = createTileContainer();
-                container.appendTo("#frameContainer");
+                container.appendTo("#background");
 
                 var tileNo = 0;
                 for (; tileNo < spacePosition; tileNo++) {
@@ -131,8 +144,8 @@ $(function () {
 
                 var spaceElement = createTile().addClass("space");
                 spaceElement.height(spaceInTheWall);
-                spaceElement.appendTo("#frameContainer");
-                
+                spaceElement.appendTo(container);
+
                 for (; tileNo < totalNumTiles; tileNo++) {
 
                         createTile().appendTo(container);
@@ -149,8 +162,12 @@ $(function () {
 
 
         function createTileContainer() {
-
-                return $(".obstacleContainer.hide").clone().removeClass("hide");
+                var container = $(".obstacleContainer.hide").clone().removeClass("hide");
+                container.
+                        css("left", CONSTANTS.WALL_DIMENTIONS.right - 3 * CONSTANTS.WALL_THICKNESS).
+                        css("height", CONSTANTS.WALL_DIMENTIONS.bottom - 2 * CONSTANTS.WALL_THICKNESS).
+                        css("top", CONSTANTS.WALL_THICKNESS);
+                return container;
         }
 
 
@@ -173,10 +190,10 @@ $(function () {
 
         function removeBullet() {
 
-                $('.bullet').each(function () {
+                $('.bullet').not(".hide").each(function () {
 
-                       this.remove();
-                       
+                        this.remove();
+
                 });
         }
 
@@ -185,6 +202,7 @@ $(function () {
 
                 over = true;
                 removeBullet();
+                //clearDivs();
                 $('#gameOver').fadeIn();
                 clearInterval(mainIntervalId);
                 retry.slideDown();
@@ -313,7 +331,7 @@ $(function () {
                 return r1[1] > r2[0] || r1[0] === r2[0];
         }
 
-        function isColliding(elem1,elem2) {
+        function isColliding(elem1, elem2) {
 
                 var pos1 = getPositions(elem1);
                 var pos2 = getPositions(elem2);
@@ -321,5 +339,20 @@ $(function () {
                 return comparePositions(pos1[0], pos2[0]) && comparePositions(pos1[1], pos2[1]);
 
         }
-        
+
+        function isCollidingWithWall(element) {
+                var wallDimentions = CONSTANTS.WALL_DIMENTIONS;
+                var positions = getPositions(element);
+                var pos = {
+                        left: positions[0][0],
+                        top: positions[1][0],
+                        right: positions[0][1],
+                        bottom: positions[1][1]
+                }
+                return pos.left <= wallDimentions.left ||
+                        pos.right >= wallDimentions.right ||
+                        pos.bottom >= wallDimentions.bottom ||
+                        pos.top <= wallDimentions.top;
+        }
+
 });

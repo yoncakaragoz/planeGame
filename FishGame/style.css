@@ -20,8 +20,6 @@
 .frame
 {
         display: block;
-        width: 960px;
-        height: 500px;
         position: absolute;
         top: 100px;
 }
@@ -70,7 +68,6 @@
         position: absolute;
         display: inline-block;
         width: 20px;
-        height: 400px;
 }
 
 .hide
@@ -80,10 +77,10 @@
 
 .obstacle
 {
-        background: url(red.jpg) repeat;
-        width: 20px;
+        background: #C00;
+        width: 15px;
         height: 20px;
-        display: inline-block;
+        display: block;
 }
 
 .space
@@ -115,8 +112,6 @@
 {
         position: absolute;
         background: #b2afaf;
-        width: 10px;
-        height: 10px;
 }
 
 .horizontal

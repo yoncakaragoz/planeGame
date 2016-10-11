@@ -6,6 +6,9 @@ MinimumVisualStudioVersion = 10.0.40219.1
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "FishGame", "FishGame\FishGame.csproj", "{EF12E6E9-BD1B-4855-816F-0FB23E8695C4}"
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "Solution Items", "Solution Items", "{3D27CD7B-CD92-4A9E-9A6B-11CCB04082F7}"
+	ProjectSection(SolutionItems) = preProject
+		..\..\..\Desktop\WORK WORK WORK\New folder\Super-Fish.png = ..\..\..\Desktop\WORK WORK WORK\New folder\Super-Fish.png
+	EndProjectSection
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
